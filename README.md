@@ -2,16 +2,16 @@
 
 `hera_utils` is a python package gathering helpers
 
-- facilitating the abstraction/separation of [Hera (workflows)](https://github.com/argoproj-labs/hera) based scripts from the concrete servers that shall be used to running them,
+- facilitating the abstraction/separation of [Hera based workflows](https://github.com/argoproj-labs/hera) based scripts from the concrete servers that shall be used to running them,
 - proposing a simple/direct organizational structure of numerical experiments scripts based on [Hera (workflows)](https://github.com/argoproj-labs/hera).
 
 The purpose of `hera_utils` boils down to a comment of the following diagrams
 
 ```mermaid
 classDiagram
-class Experimentation["(Numerical) Experimentation (description)"]
+class Experimentation["(Numerical) Experiment (description)"]
 class Environment["Environment (of execution)"]
-class Workflow["Workflow (code)"]
+class Workflow["Workflow (HERA code)"]
 class WorkflowLanguage["ArgoWorkflows (HERA language)"]
 class Layout["Layout (files' organisation)"]
 class Inputs["Inputs (parameters)"]
@@ -22,28 +22,32 @@ Experimentation o-- Inputs
 Experimentation o-- Environment
 ```
 
-The description of a (numerical) experimentation (more generaly of a job) may be structured on top of the following separated concerns
+The description of a (numerical) experiment (more generaly of a job) may be structured on top of the following separated concerns
 
 - the expression of the specific atomic computations (tasks) that should be realized and their possible organization within a [**computational workflow**](https://en.wikipedia.org/wiki/Scientific_workflow_system) e.g. [Hera](https://github.com/argoproj-labs/hera)
 - the experiment **inputs**: what concrete set of parameters should be used
 - the experiment **layout** (naming convention, organisational structure) of its inputs/outputs: where (in which file, directory, database...) does each task take its (file) inputs from and where does that task store its outputs to (and how does it name them)
-- the (execution) environment required for its execution e.g. the workflow engine that shall be used: in this ArgoWorkflows biased context, some concrete **ArgoWorflows server**
+- the (execution) environment that is the set of ressources required for the execution of the experiment e.g. a [persistent volume](https://kubernetes.io/docs/concepts/storage/persistent-volumes/), a container registry...
 
-Once given the description of an experimentation, you will will proceed to execute it (run the workflow with the help of an ArgoWorkflows engine running on some execution platform).
-It is the role of the Experimentation Execution to construct the instances required by the Experimentation to be properly executed:
+Once given (the description of) an Experiment, one uses an `execution engine` in order to proceed with its realization. When executing an Experiment, the ArgoWorkflows engine (say a Python interpreter) will
+
+1. [provision](https://en.wikipedia.org/wiki/Provisioning) a concrete instance of the Environment (of execution),
+2. launch the computations (most often) by delegating/submiting it to Workflow to some ArgoWorkflows server. The set of information required for that submission is gathered within an Environment of submission.
+
+The execution engine will thus need to hold the following data model
 
 ```mermaid
 classDiagram
 
-class Experimentation {
-    - code
-    - layout
+class Experiment {
+    - Workflow
+    - Layout
+    - Inputs
 }
-style Experimentation fill:#1a1
+style Experiment fill:#1a1
 class EnvironmentExecution[":Environment (of execution)"]
+<<hera_utils>> EnvironmentExecution
 style EnvironmentExecution fill:#faa
-class Inputs[":Inputs (parameters)"]
-style Inputs fill:#faa
 
 class ExecutionPlatform["Execution Platform"]
 style ExecutionPlatform fill:#aaf
@@ -55,24 +59,23 @@ style Cluster fill:#aaf
 class CLIContext[":Parsed Command Line Arguments"]
 <<hera_utils>> CLIContext
 style CLIContext fill:#faa
-class ExperimentationExecution
-style ExperimentationExecution fill:#faa
+class ExecutionEngine
 
 class EnvironmentSubmission[":Environment (of submission: HERA)"]
+<<hera_utils>> EnvironmentSubmission
 style EnvironmentSubmission fill:#faa
 
-ExperimentationExecution *-- EnvironmentSubmission
-ExperimentationExecution ..> ExecutionPlatform: depends
+ExecutionEngine *-- EnvironmentSubmission
+ExecutionEngine ..> ExecutionPlatform: depends
 
-Experimentation o-- Inputs
-ExperimentationExecution *-- Inputs
-ExperimentationExecution o-- Experimentation
-ExperimentationExecution *-- EnvironmentExecution
-Experimentation o-- EnvironmentExecution
+ExecutionEngine o-- Experiment
+Experiment o-- EnvironmentExecution
+ExecutionEngine *-- EnvironmentExecution
 
-EnvironmentExecution ..> CLIContext
-ExperimentationExecution *-- CLIContext
-EnvironmentSubmission ..> CLIContext
+
+EnvironmentExecution ..> CLIContext: constructed with
+ExecutionEngine *-- CLIContext
+EnvironmentSubmission ..> CLIContext: constructed with
 
 CLIContext --> WorkflowEngine
 EnvironmentSubmission o-- WorkflowEngine
@@ -83,8 +86,9 @@ WorkflowEngine ..> Cluster
 ExecutionPlatform *-- Cluster
 
 ExecutionPlatform *-- WorkflowEngine
-
 ```
+
+The objects depicted with the `<<hera_utils>>` [(UML) stereotype](https://www.uml-diagrams.org/stereotype.html) are susceptible to benefit from the `hera_utils` package.
 
 ## The big lines of what hera_utils helps you to set up
 
@@ -92,58 +96,63 @@ ExecutionPlatform *-- WorkflowEngine
 import hera_utils
 
 # Make sure that all the elements of the HERA context can be extracted from either
-# the Command Line Arguments (CLI) or environment variables:
+# the Command Line Arguments (CLI) or the environment variables:
 args = hera_utils.parse_arguments()      
 
 # Assert that the k8s cluster (designated by the CLI arguments) is accessible:
 cluster = hera_utils.k8s_cluster(args)
 
-# Assert that the ArgoWorkflows server (designated by the CLI arguments), and running
-# on the cluster, is accessible:
+# Assert that the ArgoWorkflows server (also designated by the CLI arguments and running
+# on the above cluster), is accessible:
 argo_server = hera_utils.argo_server(cluster, args)
 
-# Eventually transmit to the Hera workflow the environment/context that it expects
+# Eventually transmit to the Hera workflow the environment of submission that it expects
 # (the argo server, an associated access token, the ad-hoc namespace...): 
 argo_server.define_argo_server_part_of_environment()
 ```
 
-You can now proceed with the dependencies of an experimentation, that is its environment, input and layout
+Your python script (more precisely, your Experiment expressed as a python script) can now proceed with expressing its dependencies, that is its environment (of execution), input and layout
 
 ```python
-
 from environment import numerical_experiment_environment
 environment = numerical_experiment_environment(cluster, args)
 from my_specific_input import inputs
-from my_experiment_layout import layout
-layout_instance = layout(inputs.constants)
+from my_experiment_layout import experiment_layout
+layout = experiment_layout(inputs.constants)
+```
 
-# Eventually define the workflow code with the Hera library and on top
-# of environment, input and layout
-...
+Eventually define the workflow code with the Hera library and on top of the environment, input and layout variables
+
+```python
+define_hera_workflow(environment, input, layout)   # Based-on/uses hera.worflows
 ```
 
 ## A more complete example
 
-The above code snippet were volutarily sketchy in order to provide some understanding of what is done.The following example slightly improves on the usage of `hera_utils` by encapsulating things (hiding technical details): refer to the [`numerical_experiment_environment::construct_environment(args)` method within `examples/environment.py`](./examples/environment.py) for some clues on how this is done.
+The above code snippets were voluntarily sketchy/abstract in order to simplify the understanding of the functionnal logic of an (hera based) Experiment.
+The following example slightly improves on the usage of `hera_utils` by hiding technical functionnal details under the hood: refer to the [`numerical_experiment_environment::construct_environment(args)` method within `examples/environment.py`](./examples/environment.py) for some clues on how this encapsulation is realized.
 
-Additionnaly the following code provides more detailed comments
+Additionnaly the following code also provides more detailed comments
 
 ```python
 if __name__ == "__main__":
     from hera_utils import parse_arguments
     # Retrieve the parsed CLI arguments and environment variables (of the python script)
     # that designates (and provides access to e.g. through credentials):
-    #   1. `k8s_cluster`: an accessible Kubernetes cluster
-    #   2. `argo_server`: an ArgoWorkflows server (running on the above k8s cluster)
-    # Hera will this `argo_server` to submit the workflows (that is on which the following 
-    # workflow with be executed):
+    #   1. a `k8s_cluster`: an accessible Kubernetes cluster
+    #   2. an `argo_server`: an ArgoWorkflows server (running on the above k8s cluster)
+    # Hera (when interpred with Python) will use this `argo_server` to submit the workflow 
+    # (that is the server on which the following workflow will be executed):
     args = parse_arguments()
 
     from environment import construct_environment
-    # The environment might also depend on CLI argument and/on environment variables in
+    # The environment might also depend on the CLI argument and/on environment variables in
     # order for the numertical experiment to retrieve e.g. 
-    # - k8s volume claims (for its inputs/outputs)
+    # - some k8s volume claims (for its inputs/outputs)
     # - k8s config maps used to retrieve cluster specific information (HTTP proxy...)
+    # The construct_environment() function encapsulates/hides 
+    # - the usage of the k8s_cluster of provision the Experiment execution environment
+    # - the construction of the Hera (library) submission environment
     environment = construct_environment(args)
 
     # Import the inputs (aka parameters) of this numerical experiment
@@ -151,8 +160,8 @@ if __name__ == "__main__":
 
     # Define the numerical experiment input/output file layout (directory hierarchy, 
     # filenames for each task...)
-    from my_experiment_layout import layout
-    layout_instance = layout(inputs.constants)
+    from my_experiment_layout import experiment_layout
+    layout = layout(inputs.constants)
 
     # Proceed with the definition of the workflow that is solely based on the above
     # defined abstractions/encapsulations that is the
@@ -160,7 +169,11 @@ if __name__ == "__main__":
     # - inputs (what must be changed when the numerical experiment changes: its parameters)
     # - layout (how the numerical experiment names its input/output (files, generated
     #   container) and organizes them (directory structure)
-    # This is the part where hera.workflows is used to define the task:
+    # This is the part where hera.workflows library is used in order to define the tasks/workflow.
+    # The following workflow definition restricts its inputs to the following variables:
+    # - environment, 
+    # - input, 
+    # - layout
     from hera.workflows import DAG, Task, Workflow
     with Workflow(generate_name="do-some-stuff-", entrypoint="dag") as w:
         with DAG(name="dag"):
@@ -176,7 +189,7 @@ if __name__ == "__main__":
                 # The result directory depends both on
                 #  - a k8s volume claim pertaining to the environment
                 #  - an organisational choice encapsulated in the layout class
-                #    (and pametrized with the inpjut)
+                #    (and parametrized with the input)
                 results_dir = os.path.join(
                     environment.persisted_volume.mount_path,
                     layout.collect_output_dir(vintage)
