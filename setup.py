@@ -10,10 +10,9 @@ ROOT_DIR = os.path.dirname(__file__)
 SOURCE_DIR = os.path.join(ROOT_DIR)
 
 install_requires = [
-    'python_version >= "3.8"',
-    'kubernetes == "26.1.0"',
-    "configargparse",
-    'hera >= "5.6.0"',
+    'kubernetes==26.1.0',
+    'configargparse',
+    'hera >= 5.6.0',
 ]
 
 version = None
