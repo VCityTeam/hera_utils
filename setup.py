@@ -36,6 +36,7 @@ setup(
     },
     packages=find_packages(exclude=["tests.*", "tests"]),
     python_requires=">=3.8",
+    install_requires=install_requires,
     zip_safe=False,
     classifiers=[
         "Environment :: Other Environment",
