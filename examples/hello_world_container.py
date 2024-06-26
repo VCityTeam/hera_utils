@@ -1,6 +1,3 @@
-import sys, os
-
-sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from hera_utils import parse_arguments
 from environment import construct_environment
 
