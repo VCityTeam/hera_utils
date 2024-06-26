@@ -40,8 +40,7 @@ Experimentation o-- Inputs
 Experimentation o-- Environment
 ```
 
-The description of a (numerical) experiment (more generally of a job) may be structured on top of the following separated concerns
-
+The description of a (numerical) experiment (more generally a set of a jobs) may be structured on top of the following separated concerns
 - the expression of the specific atomic computations (tasks) that should be realized and their possible organization within a [**computational workflow**](https://en.wikipedia.org/wiki/Scientific_workflow_system) e.g. [Hera](https://github.com/argoproj-labs/hera)
 - the experiment **inputs**: what concrete set of parameters should be used
 - the experiment **layout** (naming convention, organizational structure) of its inputs/outputs: where (in which file, directory, database...) does each task take its (file) inputs from and where does that task store its outputs to (and how does it name them)
@@ -308,7 +307,7 @@ This script can then be imported into your current active shell
 
 For this `hera_utils` configuration mode, rename the [this hera.config file](./examples/hera.config.tmpl) and customize for your cluster, argo server and with your credentials.
 
-## `heara_utils` package installation
+## `hera_utils` package installation
 
 You might wish to use a [(python) virtual environment](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/) and activate it e.g. with
 
@@ -356,8 +355,7 @@ python3.10 -m venv venv
 pip install -r .      # Installs local version
 ```
 
-WHAT MUST BE CHANGED
+### Design
 
-- get credentials at k8s https://github.com/VCityTeam/ExpeData-Workflows_testing/tree/master/ArgoWorkflows/Run_with_HERA_on_PaGoDA#retrieve-your-cluster-credentials-at-k8s-level
-- add user pour les mots de passwd pour argo server
-- installer argo-cli cf https://github.com/argoproj/argo-workflows/releases/
+HERA utils: A python class that defines some HERA utils that are commonly used in the experiments  
+Layout: Used for defining the input/output layout of the applic
