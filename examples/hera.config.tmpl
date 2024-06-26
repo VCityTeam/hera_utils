@@ -1,4 +1,4 @@
-# Hera configuration file for an Argo server with a
+# Hera configuration file of the PaGoDa platform with a
 # Python configparser shlex (unix shell like) file format.
 # References:
 #  * configparser: https://docs.python.org/3/library/configparser.html
@@ -6,13 +6,13 @@
 
 ### Kubernetes layer
 # The configuration file (can also be provided through the KUBECONFIG environment variable):
-k8s_config_file='<path-to>/kubeconfig.yaml'
+k8s_config_file='<absolute-path-to>/some-rke-file.yaml'
 # The optionnal configuration map as set by the k8s admin (usefull to provide
-# cluster specific configuration elements like the HTTP_PROXY or the DOCKER_REGISTRY
-k8s_configmap_name='mycluster-configmap-environment'
-k8s_volume_claim_name='my-pvc'
+# cluster specific configuration elements like the HTTP_PROXY or the DOCKER_REGISTRY)
+k8s_configmap_name='<some-configuration-map-on-your-cluster>'
+k8s_volume_claim_name='<some-volume-claim-name>'
 
 ### ArgoWorkflow server and associated credentials
-argo_server='argowf.pagoda.os.univ-lyon1.fr:443' 
+argo_server='argowf.my-domain.org:443' 
 argo_namespace='argo'
 argo_service_account='argo-user'

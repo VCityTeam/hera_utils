@@ -280,14 +280,14 @@ Once authenticated on your Argo Server Web UI
 
 `hera_utils` offers two concrete means (that can be combined) for configuring the servers that an Hera workflow scripts will need to access to:
 
-- by using environment variables: this assumes that it is the responsibility of the user to persist the required environment variables (most often within a [shell script](https://en.wikipedia.org/wiki/Shell_script) e.g. [this argo.bash script](./examples/argo.bash.tmpl)),
+- by using environment variables: this assumes that it is the responsibility of the user to persist the required environment variables (most often within a [shell script](https://en.wikipedia.org/wiki/Shell_script) e.g. [this hera.bash script](./examples/hera.bash.tmpl)),
 - an ad-hoc `hera_utils` configuration file (e.g. [this hera.config file](./examples/hera.config.tmpl)).
 
 The two following chapters respectively present the two above way of things.
 
 ### hera_utils configuration through environment variables
 
-The above mentioned environment variables, `KUBECONFIG`, `ARGO_SERVER`, `ARGO_NAMESPACE` can be persisted with some shell script file e.g. your [shell](https://en.wikipedia.org/wiki/Unix_shell) rc [(run command)](https://en.wikipedia.org/wiki/RUNCOM) e.g. your `~/.bash_login` or `~/.bashrc` file or some local file.For example you might rename [the `argo.bash.tmp` script](./examples/argo.bash.tmpl) to e.g. `argo.bash` and customize it.
+The above mentioned environment variables, `KUBECONFIG`, `ARGO_SERVER`, `ARGO_NAMESPACE` can be persisted with some shell script file e.g. your [shell](https://en.wikipedia.org/wiki/Unix_shell) rc [(run command)](https://en.wikipedia.org/wiki/RUNCOM) e.g. your `~/.bash_login` or `~/.bashrc` file or some local file.For example you might rename [the `hera.bash.tmpl` script](./examples/hera.bash.tmpl) to e.g. `hera.bash` and customize it.
 This script can then be imported into your current active shell
 
 - either with the `export $(grep -v '^#' hera.bash | xargs)` command
@@ -302,7 +302,7 @@ This script can then be imported into your current active shell
   }
   ```
   
-  and invoking the `importenv` command from your current active shell.
+  and invoking the `importenv hera.bash` command from your current active shell.
 
 ### hera_utils configuration through a configuration file
 
