@@ -11,10 +11,11 @@
   - [Choosing a mode of persistence for you servers environment variables](#choosing-a-mode-of-persistence-for-you-servers-environment-variables)
   - [hera\_utils configuration through environment variables](#hera_utils-configuration-through-environment-variables)
   - [hera\_utils configuration through a configuration file](#hera_utils-configuration-through-a-configuration-file)
-- [`heara_utils` package installation](#heara_utils-package-installation)
-- [Assert the installation/configuration by running the examples](#assert-the-installationconfiguration-by-running-the-examples)
+- [`hera_utils` package installation](#hera_utils-package-installation)
+- [Assert the installation/configuration by running the tests/examples](#assert-the-installationconfiguration-by-running-the-testsexamples)
 - [For developers](#for-developers)
   - [Setting up the development context](#setting-up-the-development-context)
+  - [Design](#design)
 
 ## Introduction
 
@@ -335,13 +336,9 @@ In order to quickly check the installation use
 python -c "import hera_utils"
 ```
 
-## Assert the installation/configuration by running the examples
+## Assert the installation/configuration by running the tests/examples
 
-If you're using a virtual environment, make sure it is activated. Then try running the first examples
-
-```bash
-python 
-```
+Look for the various test and examples within the [examples subdirectory](./examples/Readme.md).
 
 ## For developers
 

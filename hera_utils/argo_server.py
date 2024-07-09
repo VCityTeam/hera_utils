@@ -35,6 +35,8 @@ class argo_server:
         but they do _not_ correspond to the same service. This token provides access
         to the argo-server at the k8s level whereas ARGO_TOKEN provides access to
         the argo API.
+        References e.g. this commit
+        https://github.com/argoproj-labs/hera/commit/39f685a382cfa9f2ce2a8c77657960748502fbe6
         """
         try:
             service_account_content = (
@@ -44,7 +46,7 @@ class argo_server:
             )
         except client.exceptions.ApiException as e:
             raise RuntimeError(
-                "Unable to retrieve service account {0} within namespace {1}.\n\nOrginal Kubernets error message:\n{2}".format(
+                "Unable to retrieve service account {0} within namespace {1}.\n\nOriginal Kubernetes error message:\n{2}".format(
                     self.service_account, self.k8s_cluster.namespace, e
                 )
             ) from None
@@ -57,10 +59,10 @@ class argo_server:
     def define_argo_server_part_of_environment(self):
         """
 
-        Note: Hera handles its own context/environment (which ArgoWorflows to use)
+        Note: Hera handles its own context/environment (which ArgoWorkflows to use)
           by defining the "GlobalConfig" global variable that
           - aggregates its lower level configuration variables
-          - acts as a persasive context for all Hera classes
+          - acts as a pervasive context for all Hera classes
           There is thus nothing to be returned or accessed since the information
           flow is done through global variable accesses.
         """

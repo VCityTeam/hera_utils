@@ -4,7 +4,7 @@ import configargparse
 import logging
 
 
-def parse_arguments(logger=logging.getLogger(__name__)):
+def define_parser(logger=logging.getLogger(__name__)):
     """Define a command line parser and parse the command arguments.
 
     :param default_service_account: the name of the service account that will be used as default value
@@ -12,22 +12,22 @@ def parse_arguments(logger=logging.getLogger(__name__)):
     """
     ### Retrieve the configuration files (when they are present)
     default_config_files = list()
-    argo_homedir_configfile_path = "~/hera.config"
-    if os.path.exists(argo_homedir_configfile_path):
-        default_config_files.append(argo_homedir_configfile_path)
-    argo_cwd_configfile_path = os.path.join(os.getcwd(), "hera.config")
-    if os.path.exists(argo_cwd_configfile_path):
-        default_config_files.append(argo_cwd_configfile_path)
+    argo_homedir_config_file_path = "~/hera.config"
+    if os.path.exists(argo_homedir_config_file_path):
+        default_config_files.append(argo_homedir_config_file_path)
+    argo_cwd_config_file_path = os.path.join(os.getcwd(), "hera.config")
+    if os.path.exists(argo_cwd_config_file_path):
+        default_config_files.append(argo_cwd_config_file_path)
     if os.environ.get("ARGOCONFIG"):
-        argo_configfile_path = os.environ.get("ARGOCONFIG")
-        if os.path.exists(argo_configfile_path):
-            default_config_files.append(argo_configfile_path)
+        argo_config_file_path = os.environ.get("ARGOCONFIG")
+        if os.path.exists(argo_config_file_path):
+            default_config_files.append(argo_config_file_path)
         else:
             logger.error(
                 "Erroneous ARGOCONFIG environment variable value: ",
-                argo_configfile_path,
+                argo_config_file_path,
             )
-            print("Argo configuration file ", argo_configfile_path, " ignored")
+            print("Argo configuration file ", argo_config_file_path, " ignored")
     if default_config_files:
         print("Found config files: ", default_config_files)
 
@@ -37,18 +37,6 @@ def parse_arguments(logger=logging.getLogger(__name__)):
         help="Path to kubernetes configuration file. Default is the value of the KUBECONFIG environment variable.",
         type=str,
         default=os.environ.get("KUBECONFIG"),
-    )
-    parser.add(
-        "--k8s_configmap_name",
-        help="Name of the k8s configuration map used by cluster admin to transmit cluster specific configurations.",
-        type=str,
-        default=os.environ.get("KUBECONFIGMAP"),
-    )
-    parser.add(
-        "--k8s_volume_claim_name",
-        help="Name of the k8s volume claim to be used by numerical experiment.",
-        type=str,
-        default=os.environ.get("KUBEVOLUMECLAIMNAME"),
     )
     parser.add(
         "--argo_namespace",
@@ -68,7 +56,10 @@ def parse_arguments(logger=logging.getLogger(__name__)):
         type=str,
         default=os.environ.get("ARGO_SERVICE_ACCOUNT"),
     )
-    args = parser.parse_args()
+    return parser
+
+
+def verify_args(args, logger=logging.getLogger(__name__)):
 
     ######### K8s cluster level
     if args.k8s_config_file is None:
@@ -76,20 +67,9 @@ def parse_arguments(logger=logging.getLogger(__name__)):
         logger.error("  - setting the KUBECONFIG environment variable")
         logger.error("  - setting the --k8s_config_file argument; refer to usage below")
         logger.error("")
-        parser.print_help()
-        sys.exit()
+        return False
 
-    if args.k8s_configmap_name is None:
-        logger.debug("The optionnal name of the k8s configuration map (used by")
-        logger.debug("cluster admin to transmit cluster specific configurations).")
-        logger.debug("was not provided. When needed either try")
-        logger.error("  - setting the KUBECONFIGMAP environment variable")
-        logger.error(
-            "  - setting the --k8s_configmap_name argument; refer to usage below"
-        )
-        parser.print_help()
-
-    ######### Argo Worflow server layer
+    ######### Argo Workflows server layer
     if args.argo_server is None:
         logger.error("The name of the argo server was not provided: either try")
         logger.error("  - setting the ARGO_SERVER environment variable")
@@ -98,20 +78,19 @@ def parse_arguments(logger=logging.getLogger(__name__)):
             "  - providing the argo_server optional CLI argument; refer to usage below"
         )
         logger.error("")
-        parser.print_help()
-        sys.exit()
-    else:
-        ### For some undocumented reason the ARGO_SERVER value given by the argo UI
-        # can be of the form `server.domain.org:443` when Hera expects an URL of
-        # form `https://server.domain.org`. Try to fix that on the fly.
-        # This is kludgy and completely ad-hoc and I will deny having written that
-        # excuse for a code (and yes my github account was hacked).
-        if args.argo_server.endswith(":443"):
-            args.argo_server = args.argo_server.replace(":443", "")
-        if args.argo_server.endswith("http://"):
-            args.argo_server = args.argo_server.replace("http://", "https://")
-        if not args.argo_server.startswith("https://"):
-            args.argo_server = "https://" + args.argo_server
+        return False
+
+    ### For some undocumented reason the ARGO_SERVER value given by the argo UI
+    # can be of the form `server.domain.org:443` when Hera expects an URL of
+    # form `https://server.domain.org`. Try to fix that on the fly.
+    # This is kludgy and completely ad-hoc and I will deny having written that
+    # excuse for a code (and yes my github account was hacked).
+    if args.argo_server.endswith(":443"):
+        args.argo_server = args.argo_server.replace(":443", "")
+    if args.argo_server.endswith("http://"):
+        args.argo_server = args.argo_server.replace("http://", "https://")
+    if not args.argo_server.startswith("https://"):
+        args.argo_server = "https://" + args.argo_server
 
     if args.argo_service_account is None:
         logger.error("Name of the service account not defined: either try")
@@ -119,15 +98,27 @@ def parse_arguments(logger=logging.getLogger(__name__)):
         logger.error(
             "  - providing the service_account optional argument; refer to usage below"
         )
-        logger.error("")
-        parser.print_help()
-        sys.exit()
+        return False
 
     if args.argo_namespace is None:
         logger.error("The namespace used by argo within k8s is not defined: either try")
         logger.error("  - setting the ARGO_NAMESPACE environment variable")
         logger.error("  - setting the --namespace argument; refer to usage below")
         logger.error("")
+        return False
+    return True
+
+
+def parse_arguments(logger=logging.getLogger(__name__)):
+    """Define a command line parser and parse the command arguments.
+
+    :param default_service_account: the name of the service account that will be used as default value
+    :return: the arguments that were retrieved by the parser
+    """
+    parser = define_parser()
+    args = parser.parse_args()
+    args_are_correct = verify_args(args)
+    if not args_are_correct:
         parser.print_help()
         sys.exit()
     return args

@@ -1,8 +1,7 @@
-from hera_utils import parse_arguments
-from environment import construct_environment
+from hera_utils import parse_arguments, num_exp_environment
 
 args = parse_arguments()
-environment = construct_environment(args)
+environment = num_exp_environment(args)  # Configures Hera
 
 ###############################################################################
 # The following is a copy of

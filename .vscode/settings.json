@@ -6,7 +6,16 @@
         "markdown"
     ],
     "cSpell.words": [
+        "argo",
+        "configargparse",
+        "configmap",
+        "cowsay",
+        "cowsayprint",
+        "github",
+        "hera",
         "kubeconfig",
-        "Kurbenetes"
+        "kubernetes",
+        "Kurbenetes",
+        "whalesay"
     ]
 }
