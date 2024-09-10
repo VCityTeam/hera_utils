@@ -68,8 +68,16 @@ def assert_configmap_environment(
     ],
 )
 def does_the_mounted_appear_in_list(
-    # claim_name argument is only used by the @script decorator and is present
-    # here only because Hera seems to require it
+    # Both the config_map_name and claim name arguments are not used in the
+    # body definition of this function. They are only used by the @script decorator
+    # (refer above). Yet Hera seems to require the presence of those arguments
+    # in the definition of the function in order to be able to transmit them
+    # to the decorator argument.
+    #
+    # Concerning the need for a config_map. The does_the_mounted_appear_in_list function 
+    # starts with the installation, with pip, of the "psutil" python package. When the 
+    # ArgoWorflow server is behind a firewall, we (most often/might) need a proxy for
+    # pip to be able to reach PyPI package archive.
     config_map_name,
     claim_name,
     mount_path,
