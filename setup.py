@@ -10,7 +10,7 @@ ROOT_DIR = os.path.dirname(__file__)
 SOURCE_DIR = os.path.join(ROOT_DIR)
 
 install_requires = [
-    'kubernetes==26.1.0',
+    'kubernetes==29.0.0',
     'configargparse',
     'hera >= 5.6.0',
 ]
@@ -34,7 +34,7 @@ setup(
         "Tracker": "https://github.com/VCityTeam/ExpeData-Workflows_testing/issues",
     },
     packages=find_packages(exclude=["tests.*", "tests"]),
-    python_requires=">=3.8",
+    python_requires=">=3.10",
     install_requires=install_requires,
     zip_safe=False,
     classifiers=[
@@ -42,7 +42,7 @@ setup(
         "Intended Audience :: Developers",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.10",
         "Topic :: Software Development",
         "Topic :: Utilities",
     ],

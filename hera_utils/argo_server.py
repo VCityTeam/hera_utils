@@ -39,10 +39,14 @@ class argo_server:
         https://github.com/argoproj-labs/hera/commit/39f685a382cfa9f2ce2a8c77657960748502fbe6
         """
         try:
-            service_account_content = (
-                self.k8s_cluster.v1.read_namespaced_service_account(
-                    self.service_account, self.k8s_cluster.namespace
+            token_request_body = client.AuthenticationV1TokenRequest(
+                spec=client.V1TokenRequestSpec(
+                    audiences=[],
+                    expiration_seconds=3600
                 )
+            )
+            api_response = self.k8s_cluster.v1.create_namespaced_service_account_token(
+                name=self.service_account, namespace=self.k8s_cluster.namespace, body=token_request_body
             )
         except client.exceptions.ApiException as e:
             raise RuntimeError(
@@ -50,11 +54,7 @@ class argo_server:
                     self.service_account, self.k8s_cluster.namespace, e
                 )
             ) from None
-        secret_name = service_account_content.secrets[0].name
-        secret = self.k8s_cluster.v1.read_namespaced_secret(
-            secret_name, self.k8s_cluster.namespace
-        ).data
-        return base64.b64decode(secret["token"]).decode()
+        return api_response.status.token
 
     def define_argo_server_part_of_environment(self):
         """
