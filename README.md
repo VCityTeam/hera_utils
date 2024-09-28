@@ -3,25 +3,25 @@
 ## Table of contents<!-- omit from toc -->
 
 - [Introduction](#introduction)
-- [What `hera_utils` should help you setting up: a functional description](#what-hera_utils-should-help-you-setting-up-a-functional-description)
+- [What `hera_utils` should help you set up: a functional description](#what-hera_utils-should-help-you-set-up-a-functional-description)
 - [A more complete example](#a-more-complete-example)
-- [Configuring the access to the Kubernetes and Argo servers](#configuring-the-access-to-the-kubernetes-and-argo-servers)
-  - [Retrieve your Kurbenetes cluster credentials (for CLI usage)](#retrieve-your-kurbenetes-cluster-credentials-for-cli-usage)
-  - [Retrieve your Argo Server credentials (for CLI usage)](#retrieve-your-argo-server-credentials-for-cli-usage)
-  - [Choosing a mode of persistence for you servers environment variables](#choosing-a-mode-of-persistence-for-you-servers-environment-variables)
-  - [hera\_utils configuration through environment variables](#hera_utils-configuration-through-environment-variables)
-  - [hera\_utils configuration through a configuration file](#hera_utils-configuration-through-a-configuration-file)
+- [Configuring access to the Kubernetes and Argo servers](#configuring-access-to-the-kubernetes-and-argo-servers)
+    - [Retrieve your Kubernetes cluster credentials (for CLI usage)](#retrieve-your-kubernetes-cluster-credentials-for-cli-usage)
+    - [Retrieve your Argo Server credentials (for CLI usage)](#retrieve-your-argo-server-credentials-for-cli-usage)
+    - [Choosing a mode of persistence for your servers' environment variables](#choosing-a-mode-of-persistence-for-your-servers-environment-variables)
+    - [hera\_utils configuration through environment variables](#hera_utils-configuration-through-environment-variables)
+    - [hera\_utils configuration through a configuration file](#hera_utils-configuration-through-a-configuration-file)
 - [`hera_utils` package installation](#hera_utils-package-installation)
 - [Assert the installation/configuration by running the tests/examples](#assert-the-installationconfiguration-by-running-the-testsexamples)
 - [For developers](#for-developers)
-  - [Setting up the development context](#setting-up-the-development-context)
-  - [Design](#design)
+    - [Setting up the development context](#setting-up-the-development-context)
+    - [Design](#design)
 
 ## Introduction
 
-`hera_utils` is a python package gathering helpers
+`hera_utils` is a Python package gathering helpers
 
-- facilitating the abstraction/separation of [Hera based workflows](https://github.com/argoproj-labs/hera) based scripts from the concrete servers that shall be used to running them,
+- facilitating the abstraction/separation of [Hera-based workflows](https://github.com/argoproj-labs/hera) based scripts from the concrete servers that shall be used to run them,
 - proposing a simple/direct organizational structure of numerical experiments scripts based on [Hera (workflows)](https://github.com/argoproj-labs/hera).
 
 The purpose of `hera_utils` boils down to a comment of the following diagrams
@@ -41,7 +41,7 @@ Experimentation o-- Inputs
 Experimentation o-- Environment
 ```
 
-The description of a (numerical) experiment (more generally a set of a jobs) may be structured on top of the following separated concerns
+The description of a (numerical) experiment (more generally a set of jobs) may be structured on top of the following separated concerns:
 - the expression of the specific atomic computations (tasks) that should be realized and their possible organization within a [**computational workflow**](https://en.wikipedia.org/wiki/Scientific_workflow_system) e.g. [Hera](https://github.com/argoproj-labs/hera)
 - the experiment **inputs**: what concrete set of parameters should be used
 - the experiment **layout** (naming convention, organizational structure) of its inputs/outputs: where (in which file, directory, database...) does each task take its (file) inputs from and where does that task store its outputs to (and how does it name them)
@@ -58,9 +58,9 @@ The execution engine will thus need to hold the following data model
 classDiagram
 
 class Experiment {
-    - Workflow
-    - Layout
-    - Inputs
+        - Workflow
+        - Layout
+        - Inputs
 }
 style Experiment fill:#1a1
 class EnvironmentExecution[":Environment (of execution)"]
@@ -108,7 +108,7 @@ ExecutionPlatform *-- WorkflowEngine
 
 The objects depicted with the `<<hera_utils>>` [(UML) stereotype](https://www.uml-diagrams.org/stereotype.html) are susceptible to benefit from the `hera_utils` package.
 
-## What `hera_utils` should help you setting up: a functional description
+## What `hera_utils` should help you set up: a functional description
 
 ```python
 import hera_utils
@@ -129,7 +129,7 @@ argo_server = hera_utils.argo_server(cluster, args)
 argo_server.define_argo_server_part_of_environment()
 ```
 
-Your python script (more precisely, your Experiment expressed as a python script) can now proceed with expressing its dependencies, that is its environment (of execution), input and layout
+Your Python script (more precisely, your Experiment expressed as a Python script) can now proceed with expressing its dependencies, that is its environment (of execution), input and layout
 
 ```python
 from environment import numerical_experiment_environment
@@ -147,36 +147,36 @@ define_hera_workflow(environment, input, layout)   # Based-on/uses hera.workflow
 
 ## A more complete example
 
-The above code snippets were voluntarily sketchy/abstract in order to simplify the understanding of the functional logic of an (hera based) Experiment.
+The above code snippets were voluntarily sketchy/abstract in order to simplify the understanding of the functional logic of a (Hera-based) Experiment.
 The following example slightly improves on the usage of `hera_utils` by hiding technical functional details under the hood: refer to the [`numerical_experiment_environment::construct_environment(args)` method within `examples/environment.py`](./examples/environment.py) for some clues on how this encapsulation is realized.
 
-Additionally the following code also provides more detailed comments
+Additionally, the following code also provides more detailed comments
 
 ```python
 if __name__ == "__main__":
-    from hera_utils import parse_arguments
-    # Retrieve the parsed CLI arguments and environment variables (of the python script)
-    # that designates (and provides access to e.g. through credentials):
-    #   1. a `k8s_cluster`: an accessible Kubernetes cluster
-    #   2. an `argo_server`: an ArgoWorkflows server (running on the above k8s cluster)
-    # Hera (when interpreted with Python) will use this `argo_server` to submit the workflow 
-    # (that is the server on which the following workflow will be executed):
-    args = parse_arguments()
+        from hera_utils import parse_arguments
+        # Retrieve the parsed CLI arguments and environment variables (of the Python script)
+        # that designate (and provide access to e.g. through credentials):
+        #   1. a `k8s_cluster`: an accessible Kubernetes cluster
+        #   2. an `argo_server`: an ArgoWorkflows server (running on the above k8s cluster)
+        # Hera (when interpreted with Python) will use this `argo_server` to submit the workflow 
+        # (that is the server on which the following workflow will be executed):
+        args = parse_arguments()
 
-    from environment import construct_environment
-    # The environment might also depend on the CLI argument and/on environment variables in
-    # order for the numerical experiment to retrieve e.g. 
-    # - some k8s volume claims (for its inputs/outputs)
-    # - k8s config maps used to retrieve cluster specific information (HTTP proxy...)
-    # The construct_environment() function encapsulates/hides 
-    # - the usage of the k8s_cluster of provision the Experiment execution environment
-    # - the construction of the Hera (library) submission environment
-    environment = construct_environment(args)
+        from environment import construct_environment
+        # The environment might also depend on the CLI argument and/or environment variables in
+        # order for the numerical experiment to retrieve e.g. 
+        # - some k8s volume claims (for its inputs/outputs)
+        # - k8s config maps used to retrieve cluster-specific information (HTTP proxy...)
+        # The construct_environment() function encapsulates/hides 
+        # - the usage of the k8s_cluster to provision the Experiment execution environment
+        # - the construction of the Hera (library) submission environment
+        environment = construct_environment(args)
 
-    # Import the inputs (aka parameters) of this numerical experiment
-    from my_specific_input import inputs
+        # Import the inputs (aka parameters) of this numerical experiment
+        from my_specific_input import inputs
 
-    # Define the numerical experiment input/output file layout (directory hierarchy, 
+        #
     # filenames for each task...)
     from my_experiment_layout import experiment_layout
     layout = layout(inputs.constants)
@@ -355,4 +355,72 @@ pip install -r .      # Installs local version
 ### Design
 
 HERA utils: A python class that defines some HERA utils that are commonly used in the experiments  
-Layout: Used for defining the input/output layout of the applic
+Layout: Used for defining the input/output layout of the application
+
+### Sequence diagram
+
+```mermaid
+sequenceDiagram
+    title User uses kube config to submit a workflow
+    participant User
+    participant Rancher
+    participant KubeAPI as API Kubernetes
+    participant ArgoServer as Argo Server
+
+    User->>KubeAPI: [Kube config] Authentication
+    KubeAPI-->>User: K8s token (success/failed)
+
+    User->>ArgoServer: [WF + K8s token] Workflow submission
+    ArgoServer->> KubeAPI: [service account + WF + K8s token] Workflow creation
+    KubeAPI-->>ArgoServer: Workflow (success/failed)
+
+    ArgoServer-->>User: (success/failed)
+```
+
+```mermaid
+sequenceDiagram
+    title User uses Argo token to submit a workflow
+    participant User
+    participant ArgoServer as Argo Server
+    participant ArgoController as Argo Controller
+    participant KubeAPI as API Kubernetes
+
+    User->>ArgoServer: Authentication via UI
+    ArgoServer-->>User: Argo token (success/failed)
+
+    User->>ArgoServer: [WF + Argo token + namespace] Workflow submission
+    ArgoServer->>ArgoServer: [Argo token] Token verification (rights + token validity)
+    ArgoServer->>ArgoController: [WF, namespace] Workflow submission
+    ArgoController->> KubeAPI: [Ressources + namespace] Workflow creation
+    KubeAPI-->>ArgoController: Ressources deployed (success/failed)
+    ArgoController-->>ArgoServer: (success/failed)
+
+    ArgoServer-->>User: (success/failed)
+```
+
+## Using Hera utils to submit a workflow
+### Prerequisites
+- Have all the necessary network access to connect to Rancher and Argo
+
+### Working on Rancher (K8S)
+- Create a project
+- Create a namespace within the project (When creating the namespace, Rancher associates [role bindings](https://kubernetes.io/docs/reference/access-authn-authz/rbac/) to the namespace to grant rights to the user)
+
+### Working on Argo
+- Ask the administrators to grant you access to the Argo service by providing your project and namespace
+
+From this point, you are now authorized and autonomous to submit your workflows on Argo.
+
+#### Submitting a workflow
+##### Using the kubeconfig file
+- Download the kubeconfig file of your cluster from Rancher
+
+INFO: The kubeconfig file is a configuration file that contains authentication information for accessing a Kubernetes cluster.
+It is used by the kubectl command-line tool to communicate with the cluster.
+It grants you the rights to perform any actions within your namespace.
+
+##### Using the Argo token
+Warning: the Argo token might not give you the access to the cluster. It is used to submit workflows on the Argo server.
+You may not to be able to check some information about the cluster.
+
+- Read the [Argo Workflows manual](https://argo-workflows.readthedocs.io/en/stable/quick-start/)

@@ -1,5 +1,4 @@
 import sys
-import base64
 from kubernetes import client
 from hera.shared._global_config import GlobalConfig
 
