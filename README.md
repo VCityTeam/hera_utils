@@ -359,23 +359,20 @@ Layout: Used for defining the input/output layout of the application
 
 ### Sequence diagram
 
-```mermaid
-sequenceDiagram
-    title User uses kube config to submit a workflow
-    participant User
-    participant Rancher
-    participant KubeAPI as API Kubernetes
-    participant ArgoServer as Argo Server
 
-    User->>KubeAPI: [Kube config] Authentication
-    KubeAPI-->>User: K8s token (success/failed)
 
-    User->>ArgoServer: [WF + K8s token] Workflow submission
-    ArgoServer->> KubeAPI: [service account + WF + K8s token] Workflow creation
-    KubeAPI-->>ArgoServer: Workflow (success/failed)
 
-    ArgoServer-->>User: (success/failed)
-```
+
+## Using Hera utils to submit a workflow
+
+As recalled by the [Hera authentication documentation](https://hera.readthedocs.io/en/stable/walk-through/authentication/)
+`the way you authenticate generally depends on your unique organization setup.`
+
+### Argo server (direct) authentication handling
+
+In this authentication setup, the user has to know and provide an `ARGO_SERVER` token.
+For this the user might retrieve his `ARGO_SERVER` token through the ARGO UI.
+The corresponding authentication sequence diagram goes
 
 ```mermaid
 sequenceDiagram
@@ -385,9 +382,11 @@ sequenceDiagram
     participant ArgoController as Argo Controller
     participant KubeAPI as API Kubernetes
 
+    Note over User,ArgoServer: ARGO_SERVER token retrieval through UI
     User->>ArgoServer: Authentication via UI
     ArgoServer-->>User: Argo token (success/failed)
 
+    Note over User,ArgoServer: submission of workflow to argo server
     User->>ArgoServer: [WF + Argo token + namespace] Workflow submission
     ArgoServer->>ArgoServer: [Argo token] Token verification (rights + token validity)
     ArgoServer->>ArgoController: [WF, namespace] Workflow submission
@@ -398,7 +397,36 @@ sequenceDiagram
     ArgoServer-->>User: (success/failed)
 ```
 
-## Using Hera utils to submit a workflow
+### Delegating the authentifaction to k8s service account
+
+In this authentication mode the `ARGO_SERVER` token is setup by the cluster admin and it is the user's responsibility to retrieve it through the k8s API: refer to [this k8s_api.py example](https://github.com/argoproj-labs/hera/blob/39f685a382cfa9f2ce2a8c77657960748502fbe6/examples/k8s_sa.py#L39C9-L39C43).
+
+The sequence diagram is very similiar to the above one excpet for the first stage of token retrieval 
+
+```mermaid
+sequenceDiagram
+    title User uses kube config to submit a workflow
+    participant User
+    participant KubeAPI as API Kubernetes
+    participant ArgoServer as Argo Server
+
+    Note over User,KubeAPI: k8s service account token retrieval
+    User->>KubeAPI: [Kube config] Authentication + service account
+    KubeAPI-->>User: K8s token (success/failed)
+
+
+    Note over User,ArgoServer: submission of workflow to argo server
+    User->>ArgoServer: [WF + Argo token + namespace] Workflow submission
+    ArgoServer->>ArgoServer: [Argo token] Token verification (rights + token validity)
+    ArgoServer->>ArgoController: [WF, namespace] Workflow submission
+    ArgoController->> KubeAPI: [Ressources + namespace] Workflow creation
+    KubeAPI-->>ArgoController: Ressources deployed (success/failed)
+    ArgoController-->>ArgoServer: (success/failed)
+
+    ArgoServer-->>User: (success/failed)
+```
+
+https://argo-workflows.readthedocs.io/en/latest/managed-namespace/
 
 ### K8s Prerequisites
 
