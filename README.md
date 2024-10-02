@@ -399,12 +399,14 @@ sequenceDiagram
 ```
 
 ## Using Hera utils to submit a workflow
-### Prerequisites
-- Have all the necessary network access to connect to Rancher and Argo
 
-### Working on Rancher (K8S)
-- Create a project
-- Create a namespace within the project (When creating the namespace, Rancher associates [role bindings](https://kubernetes.io/docs/reference/access-authn-authz/rbac/) to the namespace to grant rights to the user)
+### K8s Prerequisites
+
+- Retrieve a KUBECONFIG file
+- Retrieve a kubernetes **namespace** on which the user (associated to your KUBECONFIG file) has the rights of usage.
+- Retrieve the Argo server URL 
+
+Note: if k8s cluster admin chose to use Rancher, to create a projet and to create an associated namespace (within the project), then your admin might have chose to grant rights to that namespace by using [role bindings](https://kubernetes.io/docs/reference/access-authn-authz/rbac/).
 
 ### Working on Argo
 - Ask the administrators to grant you access to the Argo service by providing your project and namespace
