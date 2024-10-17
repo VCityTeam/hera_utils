@@ -1,7 +1,9 @@
-from hera_utils import parse_arguments, num_exp_environment
+from hera_utils import argo_server, define_parser
 
-args = parse_arguments()
-environment = num_exp_environment(args)  # Configures Hera
+# Collect the workflow execution configuration context from CLI and or 
+# files.
+args = define_parser().parse_args()  
+argo_server(args)   # Transmit that information to the hera library
 
 ###############################################################################
 # The following is a copy of

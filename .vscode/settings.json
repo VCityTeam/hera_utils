@@ -13,6 +13,8 @@
         "cowsayprint",
         "github",
         "hera",
+        "argo",
+        "configargparse",
         "kubeconfig",
         "kubernetes",
         "Kurbenetes",
