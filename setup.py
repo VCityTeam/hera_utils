@@ -10,9 +10,8 @@ ROOT_DIR = os.path.dirname(__file__)
 SOURCE_DIR = os.path.join(ROOT_DIR)
 
 install_requires = [
-    'kubernetes==29.0.0',
-    'configargparse',
-    'hera >= 5.6.0',
+    "configargparse",
+    "hera >= 5.6.0",
 ]
 
 version = None
@@ -28,10 +27,10 @@ setup(
     description="Helpers for Hera (workflows) Python framework",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/VCityTeam/ExpeData-Workflows_testing/ArgoWorkflows/Workflows_In_Hera/hera_utils",
+    url="https://github.com/VCityTeam/hera_utils",
     project_urls={
-        "Source": "https://github.com/VCityTeam/ExpeData-Workflows_testing/ArgoWorkflows/Workflows_In_Hera/hera_utils",
-        "Tracker": "https://github.com/VCityTeam/ExpeData-Workflows_testing/issues",
+        "Source": "https://github.com/VCityTeam/hera_utils",
+        "Tracker": "https://github.com/VCityTeam/hera_utils/issues",
     },
     packages=find_packages(exclude=["tests.*", "tests"]),
     python_requires=">=3.10",
