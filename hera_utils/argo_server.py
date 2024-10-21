@@ -4,7 +4,7 @@ from hera.shared._global_config import GlobalConfig
 from hera.workflows import WorkflowsService
 import requests.exceptions
 import hera.exceptions
-from .define_parser import define_parser
+from .parser import parser
 
 
 class argo_server:
@@ -14,13 +14,15 @@ class argo_server:
     for a definition
     """
 
-    def __init__(self, args=define_parser().parse_args()):
+    def __init__(self, args=None):
 
         self.server = None
         self.token = None
         self.service_account = None
         self.service_namespace = None
 
+        if not args:
+            args = parser().parse_args()
         if not hasattr(args, "argo_server"):
             print("Mandatory URL of Argo server not provided.")
             print("Exiting.")

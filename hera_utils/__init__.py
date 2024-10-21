@@ -1,6 +1,6 @@
 from .version import version
 from .utils import print_version, check_version, assert_version, clear_workflow_template
-from .define_parser import define_parser
+from .parser import parser
 from .argo_server import argo_server
 from .num_exp_environment import num_exp_environment, Struct
 
@@ -12,6 +12,6 @@ __all__ = [
     "assert_version",
     "check_version",
     "clear_workflow_template",
-    "define_parser",
+    "parser",
     "argo_server",
 ]

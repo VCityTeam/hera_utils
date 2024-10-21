@@ -3,3 +3,4 @@ dist/
 hera_utils.egg-info/
 hera_utils/__pycache__
 venv
+example.log
