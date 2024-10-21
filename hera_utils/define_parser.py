@@ -11,22 +11,25 @@ def define_parser(existing_parser=None, logger=logging.getLogger(__name__)):
     """
     ### Retrieve the configuration files (when they are present)
     default_config_files = list()
-    argo_homedir_configfile_path = "~/hera.config"
-    if os.path.exists(argo_homedir_configfile_path):
-        default_config_files.append(argo_homedir_configfile_path)
-    argo_cwd_configfile_path = os.path.join(os.getcwd(), "hera.config")
-    if os.path.exists(argo_cwd_configfile_path):
-        default_config_files.append(argo_cwd_configfile_path)
+
+    argo_cwd_config_file_path = os.path.join(os.getcwd(), "hera.config")
+    if os.path.exists(argo_cwd_config_file_path):
+        default_config_files.append(argo_cwd_config_file_path)
+
     if os.environ.get("ARGOCONFIG"):
-        argo_configfile_path = os.environ.get("ARGOCONFIG")
-        if os.path.exists(argo_configfile_path):
-            default_config_files.append(argo_configfile_path)
+        argo_config_file_path = os.environ.get("ARGOCONFIG")
+        if os.path.exists(argo_config_file_path):
+            default_config_files.append(argo_config_file_path)
         else:
             logger.error(
                 "Erroneous ARGOCONFIG environment variable value: ",
-                argo_configfile_path,
+                argo_config_file_path,
             )
-            print("Argo configuration file ", argo_configfile_path, " ignored")
+            print("Argo configuration file ", argo_config_file_path, " ignored")
+
+    argo_homedir_config_file_path = "~/hera.config"
+    if os.path.exists(argo_homedir_config_file_path):
+        default_config_files.append(argo_homedir_config_file_path)
     if default_config_files:
         print("hera_utils: using config file(s)", default_config_files)
 

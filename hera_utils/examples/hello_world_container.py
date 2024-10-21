@@ -1,10 +1,10 @@
-from hera_utils import parse_arguments
-from environment import construct_environment
+# Collect authentication info from env variables and/or config files and
+# transmit that information to the hera library
+from hera_utils import argo_server
 
-args = parse_arguments()
-environment = construct_environment(args)
+argo_server()
 
-####
+#### Define the workflow
 from hera.workflows import Container, Workflow
 
 with Workflow(generate_name="hello-world-container", entrypoint="cowsay") as w:

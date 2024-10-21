@@ -48,4 +48,9 @@ setup(
     ],
     maintainer="vcity_devel",
     maintainer_email="vcity@liris.cnrs.fr",
+    entry_points={
+        "console_scripts": [
+            "hera-check-server=hera_utils.examples:check_server_availability",
+        ],
+    },
 )

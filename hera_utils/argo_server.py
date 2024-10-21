@@ -4,6 +4,7 @@ from hera.shared._global_config import GlobalConfig
 from hera.workflows import WorkflowsService
 import requests.exceptions
 import hera.exceptions
+from .define_parser import define_parser
 
 
 class argo_server:
@@ -13,7 +14,7 @@ class argo_server:
     for a definition
     """
 
-    def __init__(self, args):
+    def __init__(self, args=define_parser().parse_args()):
 
         self.server = None
         self.token = None
