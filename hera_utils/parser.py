@@ -86,7 +86,7 @@ class parser:
         )
 
     def get_config_files(self):
-        self.default_config_files
+        return self.default_config_files
         
     def parse_args(self):
         return self.parser.parse_args()
