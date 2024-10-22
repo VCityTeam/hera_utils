@@ -85,6 +85,9 @@ class parser:
             default=os.environ.get("ARGO_SERVICE_ACCOUNT"),
         )
 
+    def get_config_files(self):
+        self.default_config_files
+        
     def parse_args(self):
         return self.parser.parse_args()
 
