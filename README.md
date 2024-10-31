@@ -19,6 +19,7 @@
 ## hera_utils in a nutshell
 
 `hera_utils` is a python package, using [`ConfigArgParse`](https://github.com/bw2/ConfigArgParse) features, facilitating the authentication required by any concrete [`hera`](https://github.com/argoproj-labs/hera/blob/main/README.md) usage, through a combination of command line args, config files, hard-coded defaults, and in some cases, environment variables.
+`hera_utils` facilitates the abstraction/separation of [Hera-based workflows](https://github.com/argoproj-labs/hera) based scripts from the concrete servers that shall be used to run them.
 
 ## The difficulty and a proposed solution
 
