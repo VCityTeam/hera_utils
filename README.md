@@ -4,6 +4,7 @@
 
 - [hera\_utils in a nutshell](#hera_utils-in-a-nutshell)
 - [The difficulty and a proposed solution](#the-difficulty-and-a-proposed-solution)
+- [`hera_utils` as a diagram](#hera_utils-as-a-diagram)
 - [Configuring hera\_utils](#configuring-hera_utils)
   - [Retrieve your Argo Server credentials (for CLI usage)](#retrieve-your-argo-server-credentials-for-cli-usage)
   - [Choose a mode of persistence for your configuration](#choose-a-mode-of-persistence-for-your-configuration)
@@ -76,6 +77,58 @@ from hera.workflows import Workflow, Container
 with Workflow(generate_name="test-",entrypoint="c",) as w:
     Container(name="c", image="alpine:3.13", command=["sh", "-c", "echo hello world"])
 w.create()
+```
+
+## `hera_utils` as a diagram
+
+```mermaid
+classDiagram
+
+class ExecutionEngine
+
+class Experiment {
+  <<Python>>
+    - Configuration files
+}
+style Experiment fill:#1a1
+
+class WorkflowEngine["ArgoWorkflows Server"]
+
+class Workflow {
+  <<Python>>
+}
+style Workflow fill:#1a1
+
+class ConfigArgParse {
+  <<package>>
+}
+style ConfigArgParse fill:#faa
+
+class ExecutionEngine
+
+class hera {
+  <<package>>
+}
+
+class hera_utils {
+<<package>>
+}
+style hera_utils fill:#faa
+
+class ExecutionPlatform["Execution Platform"]
+
+Experiment o-- Workflow
+Workflow ..> hera_utils : uses 
+Workflow ..> hera : uses 
+
+ExecutionEngine o-- Experiment
+
+hera_utils ..> ConfigArgParse: uses
+hera_utils ..> hera : configures authentication
+
+ExecutionEngine ..> ExecutionPlatform : uses
+ExecutionPlatform *-- WorkflowEngine
+hera --> WorkflowEngine: submits to
 ```
 
 ## Configuring hera_utils
